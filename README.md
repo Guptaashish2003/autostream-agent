@@ -1,6 +1,10 @@
-# AutoStream Agentic Sales Workflow
+# 🎬 AutoStream Agentic Sales Workflow
 
-An AI-powered conversational agent designed for **AutoStream**, a SaaS platform for automated video editing. This agent identifies user intent, retrieves product information via RAG (Retrieval-Augmented Generation), and captures high-intent leads using tool-calling logic.
+> An intelligent conversational agent for AutoStream, a SaaS platform for automated video editing. Built with LangChain and Google Gemini, this agent uses RAG and stateful conversation management to qualify leads and provide intelligent product information.
+
+[![Python](https://img.shields.io/badge/Python-3.9%2B-blue.svg)](https://www.python.org/downloads/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.100%2B-009688.svg)](https://fastapi.tiangolo.com/)
+[![LangChain](https://img.shields.io/badge/LangChain-Latest-green.svg)](https://www.langchain.com/)
 
 ## ✨ Architecture 
 <img width="2816" height="1536" alt="Architecture of autostream-agent excalidraww" src="https://github.com/user-attachments/assets/0cce155d-cb40-4762-9e17-8004256abeda" />
@@ -8,146 +12,246 @@ An AI-powered conversational agent designed for **AutoStream**, a SaaS platform 
 ## Ui
 <img width="2256" height="1377" alt="image" src="https://github.com/user-attachments/assets/09cee310-8ed3-496f-b71b-3d945167393b" />
 
-## 🚀 Features
-- **Intent Classification**: Categorizes queries into Greetings, Info (RAG), or High Intent.
-- **RAG System**: Answers pricing and policy questions using a local JSON knowledge base.
-- **Stateful Conversation**: Retains user context and lead details across multiple turns.
-- **Lead Capture Tool**: Automatically triggers a mock API call once Name, Email, and Platform are collected.
-- **Web UI**: Modern chat interface built with FastAPI and Tailwind CSS.
 
-## 🛠️ Tech Stack
-- **Language**: Python 3.13+
-- **LLM**: Google Gemini 2.5 Flash
-- **Orchestration**: LangChain (Agentic State Management logic)
-- **Backend**: FastAPI
-- **Frontend**: Vanilla JS & Tailwind CSS
+## ✨ Key Features
+
+| Feature | Description |
+|---------|-------------|
+| 🎯 **Intent Classification** | Intelligently categorizes queries into Greetings, Information Requests, or High Intent signals |
+| 🔍 **RAG System** | Retrieves accurate answers about pricing and policies from a local knowledge base |
+| 💬 **Stateful Conversations** | Maintains context and lead details across multiple conversation turns |
+| 📊 **Smart Lead Capture** | Automatically collects Name, Email, and Platform when purchase intent is detected |
+| 🌐 **Modern Web UI** | Clean, responsive chat interface built with FastAPI and Tailwind CSS |
+
+---
+
+## 🛠️ Technology Stack
+
+- **Language**: Python 3.9+
+- **LLM Provider**: Google Gemini 2.5 Flash
+- **Orchestration**: LangChain (Stateful Agentic Logic)
+- **Backend Framework**: FastAPI
+- **Frontend**: Vanilla JavaScript + Tailwind CSS
+- **State Management**: TypedDict with DAG Architecture
+
+---
+
+## 🏗️ Architecture Overview
+
+The AutoStream agent implements a **Stateful Directed Acyclic Graph (DAG)** architecture, chosen specifically for the non-linear nature of sales conversations.
+
+### Why This Architecture?
+
+**🎛️ Controlled Tool Execution**  
+By separating Intent Detection from Response Generation, we prevent hallucinations around tool usage. The lead capture tool is only accessible when the `HIGH_INTENT` state is active.
+
+**💾 Persistent State Management**  
+State is managed through an `AgentState` TypedDict structure containing:
+- `is_collecting_lead`: Boolean flag for lead capture mode
+- `lead`: Dictionary storing collected user information
+
+This ensures data persistence across multiple LLM calls, storing information at the application layer rather than relying on model memory.
+
+**🔧 Scalable Design**  
+The modular node-based architecture allows easy addition of new capabilities (technical support, discount calculations, etc.) without core logic rewrites.
+
+---
 
 ## 📋 Prerequisites
-- Python 3.9 or higher
-- Google Gemini API Key (from [Google AI Studio](https://aistudio.google.com/))
+
+Before you begin, ensure you have:
+- Python 3.9 or higher installed
+- A Google Gemini API Key ([Get one here](https://aistudio.google.com/))
+- Git for version control
+
+---
 
 ## ⚙️ Installation & Setup
 
-1. **Clone the Repository**
-   ```bash
-   git clone https://github.com/your-username/autostream-agent.git
-   cd autostream-agent
+### 1. Clone the Repository
 
+```bash
+git clone https://github.com/your-username/autostream-agent.git
+cd autostream-agent
+```
 
-Create Virtual Environment
-code Bash
+### 2. Create Virtual Environment
 
-    
+**Windows:**
+```bash
 python -m venv venv
-source venv/Scripts/activate  # Windows
-# source venv/bin/activate    # Mac/Linux
+venv\Scripts\activate
+```
 
-  
+**macOS/Linux:**
+```bash
+python -m venv venv
+source venv/bin/activate
+```
 
-Install Dependencies
-code Bash
+### 3. Install Dependencies
 
-    
+```bash
 pip install -r requirements.txt
+```
 
-  
+### 4. Configure Environment Variables
 
-Environment Variables
-Create a .env file in the root directory:
-code Env
+Create a `.env` file in the root directory:
 
-    
+```env
 GOOGLE_API_KEY=your_gemini_api_key_here
+```
 
-  
+### 5. Run the Application
 
-Run the Application
-code Bash
+**Web Interface:**
+```bash
+python server.py
+```
+Then open your browser at `http://127.0.0.1:8000`
 
-        
-    python server.py    
-    Open your browser at http://127.0.0.1:8000
+**CLI Interface:**
+```bash
+python main.py
+```
 
+---
 
-Run Application in CLI
-code Bash
-        
-    python main.py  
+## 📁 Project Structure
 
-
-🏗️ Architecture Explanation (~200 words)
-
-The AutoStream agent utilizes a Stateful Directed Acyclic Graph (DAG) architecture. I chose this approach (inspired by LangGraph principles) over a simple linear chain because sales conversations are non-linear. A user might start with a greeting, jump to pricing (RAG), and then suddenly express interest in signing up (Lead Capture).
-
-Why this Architecture?
-
-    Control: By separating Intent Detection from Response Generation, we prevent "hallucinations" regarding tool execution. The tool is only accessible if the HIGH_INTENT state is active.
-
-    State Management: State is managed using a TypedDict structure called AgentState. This carries a is_collecting_lead boolean flag and a lead dictionary. This ensures that even if the LLM is called multiple times, the accumulated data (like the user's name) is persisted in the application layer, not just the model's transient memory.
-
-    Scalability: This design allows us to add more "nodes" (e.g., a technical support node or a discount calculation node) without rewriting the core logic.
-
-📱 WhatsApp Deployment Strategy
-
-To integrate this agent with WhatsApp, I would use the WhatsApp Business Platform (Cloud API).
-
-Steps for Integration:
-
-    Webhook Setup: Create a FastAPI endpoint (e.g., /webhook) that accepts POST requests from Meta.
-
-    Verification: Implement a GET handler for the endpoint to verify the "Webhook Token" required by Meta.
-
-    Message Processing:
-
-        When a user sends a message, Meta sends a JSON payload containing the sender's phone number (acting as the session_id) and the text.
-
-        The backend processes this through the Agent logic.
-
-    Response: Use the WhatsApp API's /messages endpoint to send the agent's response back to the user's phone number.
-
-    Session Handling: Store the AgentState in a database (like Redis or MongoDB) keyed by the user's phone number to maintain state across the asynchronous nature of WhatsApp messages.
-
-📂 Project Structure
-code Text
-
-    
+```
 autostream-agent/
 ├── agent/
-│   ├── graph.py       # Lead capture & high-intent logic
-│   ├── intent.py      # LLM Intent classification
-│   ├── rag.py         # Knowledge retrieval logic
-│   ├── state.py       # TypedDict state definitions
-│   └── tools.py       # Mock lead capture function
+│   ├── graph.py          # Lead capture & high-intent logic
+│   ├── intent.py         # LLM intent classification
+│   ├── rag.py            # Knowledge retrieval system
+│   ├── state.py          # TypedDict state definitions
+│   └── tools.py          # Mock lead capture function
 ├── data/
-│   └── knowledge_base.json # Pricing & policies
+│   └── knowledge_base.json    # Pricing & policy information
 ├── static/
-│   └── index.html     # Web UI
-├── server.py          # FastAPI Backend
-└── .env               # API Keys
+│   └── index.html        # Web UI interface
+├── server.py             # FastAPI backend server
+├── main.py               # CLI entry point
+├── requirements.txt      # Python dependencies
+├── .env                  # Environment variables (create this)
+└── README.md            # Project documentation
+```
 
+---
+
+## 📱 WhatsApp Deployment Strategy
+
+### Integration Approach
+
+To deploy this agent on WhatsApp, we leverage the **WhatsApp Business Platform (Cloud API)**.
+
+### Implementation Steps
+
+**1. Webhook Configuration**
+- Create a FastAPI endpoint `/webhook` to receive POST requests from Meta
+- Implement GET handler for webhook token verification
+
+**2. Message Processing Pipeline**
+```python
+# Pseudocode flow
+incoming_message = request.json
+phone_number = incoming_message['from']  # Acts as session_id
+user_text = incoming_message['text']
+
+# Process through agent
+response = agent.process(session_id=phone_number, message=user_text)
+
+# Send response back via WhatsApp API
+send_whatsapp_message(phone_number, response)
+```
+
+**3. State Persistence**
+- Store `AgentState` in Redis or MongoDB
+- Key by user's phone number for cross-message continuity
+- Handle asynchronous nature of WhatsApp messaging
+
+**4. Response Delivery**
+- Use WhatsApp API's `/messages` endpoint
+- Format responses for optimal mobile viewing
+- Support rich media (buttons, lists) for better UX
+
+---
+
+## 🎯 Usage Example
+
+**Sample Conversation Flow:**
+
+```
+User: What is the price?
+Agent: [RAG Response] Our pricing starts at $29/month for the Basic plan...
+
+User: I want to buy the Pro plan
+Agent: [Intent: HIGH_INTENT] Great! I'll help you get started. What's your name?
+
+User: John Doe
+Agent: Thanks John! What's your email address?
+
+User: john@example.com
+Agent: Perfect! Which platform do you primarily create content for?
+
+User: YouTube
+Agent: ✅ Thank you! Your information has been recorded...
+```
+
+**Terminal Output:**
+```
+✅ LEAD CAPTURED SUCCESSFULLY
+Name: John Doe
+Email: john@example.com
+Platform: YouTube
+```
+
+---
+
+## 🔑 Key Dependencies
+
+```txt
+langchain-google-genai
+fastapi
+uvicorn
+python-dotenv
+pydantic
+```
+
+---
+
+## 🚀 Future Enhancements
+
+- [ ] Add multi-language support
+- [ ] Implement CRM integration (Salesforce, HubSpot)
+- [ ] Add conversation analytics dashboard
+- [ ] Expand knowledge base with vector embeddings
+- [ ] Implement A/B testing for response variations
+
+---
+
+## 📝 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+---
+
+## 📧 Contact
+
+For questions or feedback, please reach out to [gkashish1985@gmail.com]
+
+---
+
+<div align="center">
   
+**Built with ❤️ using LangChain and Google Gemini**
 
-code Code
-
-    
-### 3. Final steps for your assignment submission:
-1. **Create the Repository**: Push your code to GitHub.
-2. **Record the Video**: Use a tool like Loom or OBS.
-    * Show yourself typing "What is the price?" (RAG).
-    * Show yourself saying "I want to buy the Pro plan" (Intent shift).
-    * Show the agent asking for Name, then Email, then Platform.
-    * Point out the terminal log showing **"✅ LEAD CAPTURED SUCCESSFULLY"**.
-3. **Double Check Files**: Make sure `requirements.txt` contains `langchain-google-genai`, `fastapi`, `uvicorn`, `python-dotenv`.
-
-Good luck with your internship application! You now have a production-ready agentic structure.
-
-  
-  
-    
-
-
-
-
-
-
-   
+</div>
