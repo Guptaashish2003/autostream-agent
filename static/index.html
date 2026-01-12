@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoStream Agent</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .chat-container { height: 70vh; overflow-y: auto; }
+    </style>
+</head>
+<body class="bg-gray-100 h-screen flex flex-col items-center justify-center p-4">
+
+    <div class="w-full max-w-2xl bg-white rounded-lg shadow-xl overflow-hidden flex flex-col">
+        <!-- Header -->
+        <div class="bg-blue-600 p-4 text-white font-bold text-lg flex justify-between">
+            <span>AutoStream Sales Agent</span>
+            <span id="status" class="text-sm font-normal opacity-80">Online</span>
+        </div>
+
+        <!-- Chat Area -->
+        <div id="chat-box" class="chat-container p-4 space-y-4 bg-gray-50">
+            <div class="bg-blue-100 p-3 rounded-lg self-start max-w-[80%] text-gray-800">
+                Hello! How can I help you with AutoStream today?
+            </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="p-4 border-t flex gap-2">
+            <input type="text" id="user-input" placeholder="Type your message..." 
+                   class="flex-1 border rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <button onclick="sendMessage()" class="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition">Send</button>
+        </div>
+    </div>
+
+    <!-- Lead Status Widget -->
+    <div id="lead-status" class="mt-4 p-4 bg-white rounded shadow text-sm hidden">
+        <h3 class="font-bold border-b mb-2">Lead Progress</h3>
+        <p>Name: <span id="s-name">-</span></p>
+        <p>Email: <span id="s-email">-</span></p>
+    </div>
+
+    <script>
+        const chatBox = document.getElementById('chat-box');
+        const userInput = document.getElementById('user-input');
+
+        async function sendMessage() {
+            const text = userInput.value;
+            if (!text) return;
+
+            // Add user message to UI
+            appendMessage(text, 'user');
+            userInput.value = '';
+
+            try {
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: text, session_id: 'user_123' })
+                });
+                
+                const data = await response.json();
+                appendMessage(data.response, 'agent');
+                updateStatus(data.state);
+            } catch (error) {
+                appendMessage("Error connecting to server.", 'agent');
+            }
+        }
+
+        function appendMessage(text, sender) {
+            const div = document.createElement('div');
+            div.className = sender === 'user' 
+                ? 'bg-blue-600 text-white p-3 rounded-lg self-end ml-auto max-w-[80%]' 
+                : 'bg-gray-200 text-gray-800 p-3 rounded-lg self-start max-w-[80%]';
+            div.innerText = text;
+            chatBox.appendChild(div);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function updateStatus(state) {
+            if (state.is_collecting_lead) {
+                document.getElementById('lead-status').classList.remove('hidden');
+                document.getElementById('s-name').innerText = state.lead.name || 'Waiting...';
+                document.getElementById('s-email').innerText = state.lead.email || 'Waiting...';
+            }
+        }
+
+        userInput.addEventListener("keypress", (e) => { if (e.key === "Enter") sendMessage(); });
+    </script>
+</body>
+</html>

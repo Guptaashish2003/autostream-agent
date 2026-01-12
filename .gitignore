@@ -1,0 +1,34 @@
+# --- API Keys & Secrets (CRITICAL) ---
+.env
+*.env
+
+# --- Python Virtual Environment ---
+venv/
+.venv/
+.env
+env/
+ENV/
+bin/
+lib/
+include/
+
+# --- Python Cache & Temporary Files ---
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.ipynb_checkpoints/
+
+# --- IDE Settings ---
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# --- OS Specific Files ---
+.DS_Store
+Thumbs.db
+
+# --- Logs ---
+*.log
